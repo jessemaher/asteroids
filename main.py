@@ -1,5 +1,5 @@
 import pygame
-from player import * 
+from player import Player 
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state
 
@@ -8,8 +8,15 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     dt = 0.0
+    
+    #Groups
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    Player.containers = (updatable, drawable)
+    #Create Player
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
+    #Game Loop
     while True:
         log_state()
         # poll for events
@@ -18,8 +25,10 @@ def main():
             if event.type == pygame.QUIT:
                 return
         screen.fill("black")
-        player.draw(screen)
-        player.update(dt)
+        #Iterate through drawable group and draw the items in the group
+        for sprite in drawable:
+            sprite.draw(screen)
+        updatable.update(dt)
         #This renders all the previous drawings, have it last if you want to see all the things you are "drawing"
         pygame.display.flip()
 
