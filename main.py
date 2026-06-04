@@ -19,6 +19,7 @@ def main():
                 return
         screen.fill("black")
         player.draw(screen)
+        player.update(dt)
         #This renders all the previous drawings, have it last if you want to see all the things you are "drawing"
         pygame.display.flip()
 
