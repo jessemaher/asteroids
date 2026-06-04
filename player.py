@@ -3,7 +3,7 @@ import pygame
 from circleshape import CircleShape
 
 class Player(CircleShape):
-    def __init__ (self, x, y):
+    def __init__ (self, x: float, y: float) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
 
@@ -15,13 +15,13 @@ class Player(CircleShape):
         c = self.position - forward * self.radius + right
         return [a, b, c]
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
-    def rotate(self, dt):
+    def rotate(self, dt: float) -> None:
         self.rotation += (PLAYER_TURN_SPEED * dt)
 
-    def move(self, dt):
+    def move(self, dt: float) -> None:
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
