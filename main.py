@@ -1,53 +1,61 @@
-import pygame
 import sys
-from player import Player 
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_state, log_event
+
+import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from logger import log_event, log_state
+from player import Player
 from shot import Shot
 
-def main():
+
+def main() -> None:
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    dt = 0.0
-    
-    #Groups
+#Groups
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
-    
-    Player.containers = (updatable, drawable)
+#Containers for groups
     Asteroid.containers = (asteroids, updatable, drawable)
-    AsteroidField.containers = (updatable)
     Shot.containers = (shots, updatable, drawable)
-    #Create Player
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+
+    Player.containers = (updatable, drawable)
+
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-    asteroid = AsteroidField()
-
-    #Game Loop
+    dt = 0.0
+#Game Loop
     while True:
         log_state()
-        # poll for events
-        # pygame.QUIT event means the user clicked X to close your window
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        screen.fill("black")
-        #Iterate through drawable group and draw the items in the group
-        for sprite in drawable:
-            sprite.draw(screen)
+
         updatable.update(dt)
-        #Collision Detection
-        for object in asteroids:
-            if object.collides_with(player) == True:
+        #Collision Detection: Ship to Asteroid
+        for asteroid in asteroids:
+            if asteroid.collides_with(player):
                 log_event("player_hit")
-                print("Game Over!")
+                print("Game over!")
                 sys.exit()
-        #This renders all the previous drawings, have it last if you want to see all the things you are "drawing"
+            #Collision between shot and asteroid
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    log_event("asteroid_shot")
+                    shot.kill()
+                    asteroid.split()
+        #Fill screen with black
+        screen.fill("black")
+        #Draw everything in drawable group
+        for obj in drawable:
+            obj.draw(screen)
+        #Render drawings
         pygame.display.flip()
 
         # limit the framerate to 60 FPS
